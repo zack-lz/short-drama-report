@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国爆款微短剧出海实战互动报告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Sand & Ocean Breeze (Bg: #FDFBF7, Accents: #4A90E2, #E67E22, #27AE60, #8E44AD) -->
+    <!-- Application Structure Plan: The SPA uses a dashboard-style interactive narrative. It starts with a regional overview (clickable cards to reveal market stats), moves to a quantitative comparison of platforms using dynamic charts (Bar & Radar), details specific platform rules through an interactive tabbed interface to avoid cognitive overload, and concludes with expandable accordions for hidden pitfalls. This structure guides the user from macro-market opportunities down to micro-execution details and risk management, making the complex data easily consumable. -->
+    <!-- Visualization & Content Choices: 
+        1. Regional Market: Goal -> Inform. Viz -> Interactive HTML Grid/Cards. Justification -> Allows users to explore specific regions without cluttering the screen.
+        2. Platform RPM: Goal -> Compare. Viz -> Chart.js Bar Chart. Justification -> Best for comparing numerical revenue values across platforms. (NO SVG).
+        3. Platform Attributes: Goal -> Relationships/Compare. Viz -> Chart.js Radar Chart. Justification -> Effectively maps multi-dimensional traits (traffic, monetization, barrier) of platforms. (NO SVG).
+        4. Platform Rules: Goal -> Organize. Viz -> Interactive Tabs. Justification -> Groups dense textual rules cleanly by platform.
+        5. Pitfalls: Goal -> Organize. Viz -> Accordion list. Justification -> Keeps the layout clean while offering deep dives into risks. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            background-color: #FDFBF7;
+            color: #333333;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .interactive-card {
+            transition: all 0.3s ease;
+        }
+        .interactive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .tab-btn.active {
+            border-bottom: 3px solid #4A90E2;
+            color: #4A90E2;
+            font-weight: bold;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .hide { display: none; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased scroll-smooth">
+
+    <nav class="sticky top-0 bg-white/90 backdrop-blur-sm shadow-sm z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl mr-2">🎬</span>
+                    <span class="font-bold text-xl tracking-tight text-[#4A90E2]">短剧出海导航</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#market" class="text-gray-600 hover:text-[#4A90E2] transition-colors">1. 市场概览</a>
+                    <a href="#monetization" class="text-gray-600 hover:text-[#4A90E2] transition-colors">2. 平台收益</a>
+                    <a href="#rules" class="text-gray-600 hover:text-[#4A90E2] transition-colors">3. 规则深度拆解</a>
+                    <a href="#pitfalls" class="text-gray-600 hover:text-[#4A90E2] transition-colors">4. 避坑指南</a>
+                    <a href="#ai-tools" class="text-[#E67E22] font-bold hover:text-[#D68910] transition-colors flex items-center gap-1 bg-orange-50 px-3 py-1 rounded-full">5. AI 出海助手 ✨</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <header class="text-center mb-20 fade-in">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-[#333333] mb-6 leading-tight">中国爆款微短剧出海实战报告</h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-4xl mx-auto">
+                随着国内微短剧市场趋于红海，大量优质剧目正加速“航海”。本交互式报告全景拆解北美、欧洲、亚洲等主流市场的受众偏好，横向对比主流分发平台（TikTok、YouTube、Reels及独立APP）的流量变现逻辑、底层规则及潜在风险。请点击下方元素进行深度探索。
+            </p>
+        </header>
+
+        <section id="market" class="mb-24 pt-8 border-t border-gray-200">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-[#E67E22] mb-4">🌍 01. 核心目标市场全景扫描</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    本节展示了各大洲目标市场的差异化特征。请点击下方的地区卡片，了解该地区的用户画像、付费习惯及题材偏好，以便精准定位您的出海第一站。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="interactive-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm cursor-pointer" onclick="updateMarket('na')">
+                    <div class="text-4xl mb-4 text-center">🇺🇸 🇨🇦</div>
+                    <h3 class="text-xl font-bold text-center text-[#333333]">北美市场</h3>
+                    <p class="text-center text-sm text-gray-500 mt-2">高净值，单片付费主力</p>
+                </div>
+                <div class="interactive-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm cursor-pointer" onclick="updateMarket('asia')">
+                    <div class="text-4xl mb-4 text-center">🇸🇬 🇲🇾</div>
+                    <h3 class="text-xl font-bold text-center text-[#333333]">东南亚及亚洲</h3>
+                    <p class="text-center text-sm text-gray-500 mt-2">文化同源，流量基本盘</p>
+                </div>
+                <div class="interactive-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm cursor-pointer" onclick="updateMarket('eu')">
+                    <div class="text-4xl mb-4 text-center">🇪🇺 🇬🇧</div>
+                    <h3 class="text-xl font-bold text-center text-[#333333]">欧洲市场</h3>
+                    <p class="text-center text-sm text-gray-500 mt-2">蓝海市场，本地化门槛高</p>
+                </div>
+            </div>
+
+            <div id="market-details" class="bg-white rounded-xl p-8 shadow-md border-l-4 border-[#E67E22] fade-in min-h-[200px]">
+                <h3 class="text-2xl font-bold text-[#333333] mb-4">👈 请选择上方地区查看详情</h3>
+                <p class="text-gray-600">点击上方的卡片，此处将展示该地区的ARPU（每用户平均收入）、主流题材偏好以及商业化建议。</p>
+            </div>
+        </section>
+
+        <section id="monetization" class="mb-24 pt-8 border-t border-gray-200">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-[#4A90E2] mb-4">💰 02. 主流平台流量与收益矩阵</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    不同的平台承载不同的商业使命。社媒平台（YouTube, TikTok, FB）主要用于赚取广告分成和公域引流，而独立APP则是最终的变现池。下图直观对比了各平台的预估千次播放收益（RPM）及综合能力维度。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-xl font-bold text-center mb-6 text-[#333333]">社媒平台短视频预估平均RPM对比</h3>
+                    <p class="text-sm text-gray-500 text-center mb-4">单位：美元 ($) / 千次播放。受地域和互动率影响较大。</p>
+                    <div class="chart-container">
+                        <canvas id="rpmChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-xl font-bold text-center mb-6 text-[#333333]">分发平台综合能力维度分析</h3>
+                    <p class="text-sm text-gray-500 text-center mb-4">分数越高（0-10），代表该平台在该维度的优势越明显。</p>
+                    <div class="chart-container">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="rules" class="mb-24 pt-8 border-t border-gray-200">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-[#8E44AD] mb-4">📜 03. 平台具体规则与限制拆解</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    不同平台的推荐算法、版权容忍度和变现门槛大相径庭。点击下方平台标签，查阅各个平台的深度玩法、规则红线以及适合的分发策略。
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="flex border-b border-gray-200 overflow-x-auto">
+                    <button class="tab-btn active flex-1 py-4 px-6 text-center font-medium text-gray-500 hover:text-[#4A90E2] transition-colors focus:outline-none" onclick="openTab(event, 'tab-yt')">
+                        ▶ YouTube Shorts
+                    </button>
+                    <button class="tab-btn flex-1 py-4 px-6 text-center font-medium text-gray-500 hover:text-[#4A90E2] transition-colors focus:outline-none" onclick="openTab(event, 'tab-tk')">
+                        🎵 TikTok
+                    </button>
+                    <button class="tab-btn flex-1 py-4 px-6 text-center font-medium text-gray-500 hover:text-[#4A90E2] transition-colors focus:outline-none" onclick="openTab(event, 'tab-fb')">
+                        📱 FB & IG Reels
+                    </button>
+                    <button class="tab-btn flex-1 py-4 px-6 text-center font-medium text-gray-500 hover:text-[#4A90E2] transition-colors focus:outline-none" onclick="openTab(event, 'tab-app')">
+                        🎬 独立短剧APP分销
+                    </button>
+                </div>
+
+                <div id="tab-yt" class="tab-content p-8 fade-in">
+                    <h3 class="text-2xl font-bold mb-4 text-[#333333]">YouTube Shorts: 长尾收益之王</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-bold text-[#27AE60] mb-2">💰 收入与规则</h4>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-2">
+                                <li>加入YPP（合作伙伴计划）门槛：1000订阅，且90天内Shorts播放量达1000万。</li>
+                                <li>广告分成模式清晰，流量具有极强的长尾效应，老视频依然能源源不断产生收益。</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-[#E67E22] mb-2">⚠️ 限制与打压</h4>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-2">
+                                <li><strong>版权审查极其严格：</strong>Content ID系统强大。直接搬运极易黄标或封号。</li>
+                                <li>必须进行深度二次创作（二创）、增加解说或反应画面。纯中文字幕硬翻极难通过获利审核。</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-6 p-4 bg-[#FDFBF7] rounded-lg">
+                        <strong class="text-[#8E44AD]">💡 补充建议：</strong> 利用Shorts为YouTube横屏长视频引流（合集模式），长视频的广告RPM远高于短视频，是实现利润最大化的最佳组合拳。
+                    </div>
+                </div>
+
+                <div id="tab-tk" class="tab-content p-8 hide fade-in">
+                    <h3 class="text-2xl font-bold mb-4 text-[#333333]">TikTok: 爆款流量制造机</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-bold text-[#27AE60] mb-2">💰 收入与规则</h4>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-2">
+                                <li>主要依赖创作者基金（Creator Rewards Program），但单价较低（RPM普遍在$0.01-$0.05）。</li>
+                                <li>算法推荐基于地域（锁区），对新手友好，极易产生百万播放的爆款。</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-[#E67E22] mb-2">⚠️ 限制与打压</h4>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-2">
+                                <li><strong>网络环境严查：</strong>做美国市场必须有干净的海外原生IP和海外SIM卡，否则直接0播放。</li>
+                                <li><strong>查重机制严厉：</strong>搬运极易触发“不适宜推荐（Not eligible for For You feed）”警告。</li>
+                                <li>音乐版权限制，必须使用商业音乐库。</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-6 p-4 bg-[#FDFBF7] rounded-lg">
+                        <strong class="text-[#8E44AD]">💡 补充建议：</strong> 不要指望靠TikTok播放量赚钱，它的核心定位应是“超级流量池”。在Bio主页挂链接，将流量导流至独立APP（CPS分销）或自己的私域才是正解。
+                    </div>
+                </div>
+
+                <div id="tab-fb" class="tab-content p-8 hide fade-in">
+                    <h3 class="text-2xl font-bold mb-4 text-[#333333]">Facebook & IG Reels: 高净值人群聚集地</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-bold text-[#27AE60] mb-2">💰 收入与规则</h4>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-2">
+                                <li>参与Performance Bonus计划或插播广告获利。欧美地区广告单价可观。</li>
+                                <li><strong>用户画像绝佳：</strong>FB用户年龄层偏大（35+），信用卡普及率高，完美契合家庭伦理、复仇题材短剧的付费人群。</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-[#E67E22] mb-2">⚠️ 限制与打压</h4>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-2">
+                                <li>对带有其他平台水印（尤其是TikTok水印）的视频大幅限流。</li>
+                                <li>近期严打“非原创实体”，未授权的大量搬运容易被限制主页获利功能。</li>
+                                <li>重度依赖粉丝互动（点赞、评论、分享）来触发算法推荐。</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-6 p-4 bg-[#FDFBF7] rounded-lg">
+                        <strong class="text-[#8E44AD]">💡 补充建议：</strong> Facebook的群组（Groups）功能被严重低估。建立特定题材（如“Werewolf Romance Series”）的私密群组，可以极大地提高用户粘性和复购率。
+                    </div>
+                </div>
+
+                <div id="tab-app" class="tab-content p-8 hide fade-in">
+                    <h3 class="text-2xl font-bold mb-4 text-[#333333]">独立APP分销: 暴利的终端战场</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-bold text-[#27AE60] mb-2">💰 收入与规则</h4>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-2">
+                                <li>模式：与ReelShort, DramaBox等平台合作，获取专属链接在社媒分发，按用户充值金额抽成（CPS），分成比例可达50%以上。</li>
+                                <li>商业模式最清晰，直接赚取美金充值，不受社媒平台广告单价波动的限制。</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-[#E67E22] mb-2">⚠️ 限制与打压</h4>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-2">
+                                <li><strong>竞争极度白热化：</strong>官方自己也在买量，个人分销商拿到的素材同质化严重。</li>
+                                <li>部分小平台存在“扣量”风险（用户充值了但后台不显示）。</li>
+                                <li>社媒平台（特别是TikTok）经常封杀外链，导致转化链路断裂。</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-6 p-4 bg-[#FDFBF7] rounded-lg">
+                        <strong class="text-[#8E44AD]">💡 补充建议：</strong> 提升剪辑能力是唯一出路。不要直接发官方素材，采用“剧评式”、“悬念式卡点”剪辑，制造强烈的未完成感，才能有效刺激用户点击链接去APP充值。
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pitfalls" class="mb-24 pt-8 border-t border-gray-200">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-[#27AE60] mb-4">⚠️ 04. 极易被忽视的深水区与隐形成本</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    出海绝不是简单的“加个英文字幕传上去”。很多团队在初期看到了流量，却死在了成本控制和合规性上。点击展开以下关键避坑指南。
+                </p>
+            </div>
+
+            <div class="max-w-4xl mx-auto space-y-4">
+                
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                    <button class="w-full text-left px-6 py-4 font-bold text-[#333333] bg-gray-50 hover:bg-gray-100 focus:outline-none flex justify-between items-center" onclick="toggleAccordion('acc1')">
+                        <span class="flex items-center"><span class="text-2xl mr-3">💸</span> 获客成本 (UA) 飙升与资金链风险</span>
+                        <span id="icon-acc1" class="text-gray-400 transition-transform duration-300">▼</span>
+                    </button>
+                    <div id="acc1" class="accordion-content bg-white">
+                        <div class="px-6 py-4 text-gray-600 border-t border-gray-100">
+                            <strong>未考虑因素：</strong> 认为只要剧好，靠自然流量就能赚钱。
+                            <br><br>
+                            <strong>真相：</strong> 头部短剧APP 80%以上的收入来源于Facebook、Google、TikTok的付费广告买量（投流）。目前北美市场单个付费用户的获取成本（CAC）已经飙升。如果没有强大的现金流支持滚动投放，或者ROI无法打正，即使剧集质量尚可，也极易资金链断裂。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                    <button class="w-full text-left px-6 py-4 font-bold text-[#333333] bg-gray-50 hover:bg-gray-100 focus:outline-none flex justify-between items-center" onclick="toggleAccordion('acc2')">
+                        <span class="flex items-center"><span class="text-2xl mr-3">🏴‍☠️</span> 海外盗版猖獗，维权成本极高</span>
+                        <span id="icon-acc2" class="text-gray-400 transition-transform duration-300">▼</span>
+                    </button>
+                    <div id="acc2" class="accordion-content bg-white">
+                        <div class="px-6 py-4 text-gray-600 border-t border-gray-100">
+                            <strong>未考虑因素：</strong> 忽视了海外（尤其是东南亚和拉美）强大的盗版网络。
+                            <br><br>
+                            <strong>真相：</strong> 你的剧一旦有了热度，第二天就会被全网盗链。大量用户会聚集在Telegram群组或盗版网站免费观看完整版。跨国维权周期长、律师费极高，对于中小出海团队来说几乎不可能。这会严重挤压官方正版的充值收入空间。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                    <button class="w-full text-left px-6 py-4 font-bold text-[#333333] bg-gray-50 hover:bg-gray-100 focus:outline-none flex justify-between items-center" onclick="toggleAccordion('acc3')">
+                        <span class="flex items-center"><span class="text-2xl mr-3">🗣️</span> 本地化陷阱：机翻字幕与口型对不上</span>
+                        <span id="icon-acc3" class="text-gray-400 transition-transform duration-300">▼</span>
+                    </button>
+                    <div id="acc3" class="accordion-content bg-white">
+                        <div class="px-6 py-4 text-gray-600 border-t border-gray-100">
+                            <strong>未考虑因素：</strong> 为了省钱，直接用AI生成英文字幕和劣质配音。
+                            <br><br>
+                            <strong>真相：</strong> 欧美用户对观影体验要求较高，对劣质配音和机翻字幕容忍度极低。特别是Lip-sync（口型同步）问题，中国演员说中文的口型配上英文声音，会产生强烈的“违和感”和“廉价感”，导致完播率暴跌。目前欧美本土化拍摄的短剧（白人面孔+纯正英语+符合当地审美的场景）正在崛起，粗制滥造的译制剧正被加速淘汰。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                    <button class="w-full text-left px-6 py-4 font-bold text-[#333333] bg-gray-50 hover:bg-gray-100 focus:outline-none flex justify-between items-center" onclick="toggleAccordion('acc4')">
+                        <span class="flex items-center"><span class="text-2xl mr-3">🕌</span> 文化冲突与合规性审查风险</span>
+                        <span id="icon-acc4" class="text-gray-400 transition-transform duration-300">▼</span>
+                    </button>
+                    <div id="acc4" class="accordion-content bg-white">
+                        <div class="px-6 py-4 text-gray-600 border-t border-gray-100">
+                            <strong>未考虑因素：</strong> 将国内的狗血剧情无缝平移到所有国家。
+                            <br><br>
+                            <strong>真相：</strong> 题材出海必须敬畏当地文化底线。例如，在东南亚部分国家（如印尼、马来西亚）或中东市场，国内短剧中常见的擦边、暴露、背叛宗教等情节，会直接面临政府文化部门的封杀或平台下架。本地化不仅是语言翻译，更是价值观的合规性重塑。
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="ai-tools" class="mb-24 pt-8 border-t border-gray-200 fade-in">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-[#E67E22] mb-4">✨ 05. AI 爆款出海助手 (Powered by Gemini)</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    摆脱机翻！输入您的中文短剧梗概，让 Gemini 大模型一键为您生成符合海外受众口味的纯正英文剧名、高转化 TikTok Hook，或进行深度的本地化合规风险审查。
+                </p>
+            </div>
+
+            <div class="bg-gradient-to-br from-white to-[#FDFBF7] border border-[#E67E22]/30 rounded-2xl shadow-lg p-6 md:p-10 max-w-5xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <!-- 输入区 -->
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">1. 瞄准目标市场</label>
+                            <select id="ai-target-market" class="w-full border border-gray-300 rounded-lg p-3 bg-white focus:ring-2 focus:ring-[#E67E22] focus:border-transparent outline-none">
+                                <option value="北美 (美国/加拿大)">🇺🇸 🇨🇦 北美市场 (追求极致爽感与本土化)</option>
+                                <option value="欧洲 (英法德)">🇪🇺 🇬🇧 欧洲市场 (要求逻辑与深度)</option>
+                                <option value="东南亚 (印尼/大马/泰国)">🇸🇬 🇲🇾 东南亚 (文化同源但有宗教禁忌)</option>
+                                <option value="中东 (沙特/阿联酋)">🇦🇪 🇸🇦 中东地区 (审查极其严格)</option>
+                                <option value="拉美 (巴西/墨西哥)">🇧🇷 🇲🇽 拉美地区 (下沉市场)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">2. 输入核心剧情梗概</label>
+                            <textarea id="ai-plot-input" rows="5" class="w-full border border-gray-300 rounded-lg p-3 bg-white focus:ring-2 focus:ring-[#E67E22] focus:border-transparent outline-none resize-none" placeholder="例如：女主前世被豪门丈夫背叛，重生后决定隐藏首富千金身份，进入丈夫公司从底层做起，手撕小三并最终夺回一切..."></textarea>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4 pt-2">
+                            <button onclick="generateHook()" class="flex-1 bg-[#4A90E2] hover:bg-[#357ABD] text-white font-bold py-3 px-4 rounded-lg transition-transform hover:-translate-y-1 flex items-center justify-center gap-2 shadow-md">
+                                ✨ 生成英文爆款文案
+                            </button>
+                            <button onclick="checkCompliance()" class="flex-1 bg-[#8E44AD] hover:bg-[#732D91] text-white font-bold py-3 px-4 rounded-lg transition-transform hover:-translate-y-1 flex items-center justify-center gap-2 shadow-md">
+                                🔍 本地化风险排查
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 结果输出区 -->
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 h-[420px] overflow-y-auto shadow-inner relative flex flex-col">
+                        <div class="sticky top-0 bg-white/90 backdrop-blur pb-2 mb-4 border-b border-gray-100 flex justify-between items-center z-10">
+                            <h3 class="font-bold text-gray-700 flex items-center gap-2">
+                                🤖 AI 分析结果
+                            </h3>
+                            <button onclick="copyResult()" id="copy-btn" class="text-sm font-bold text-[#4A90E2] hover:text-[#357ABD] transition-colors hidden">
+                                📋 复制内容
+                            </button>
+                        </div>
+                        <div id="ai-result-content" class="text-gray-600 leading-relaxed text-sm flex-1">
+                            <div class="h-full flex flex-col items-center justify-center text-gray-400">
+                                <span class="text-5xl mb-4 opacity-50">💡</span>
+                                <p>请在左侧输入剧情并点击生成按钮</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-8 text-center text-gray-500 text-sm">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>本文档为微短剧出海行业分析模型，数据来源于行业预估与抽样分析，不构成直接投资建议。</p>
+        </div>
+    </footer>
+
+    <script>
+        const marketData = {
+            na: {
+                title: "🇺🇸 🇨🇦 北美市场 (美国/加拿大)",
+                color: "#E67E22",
+                details: `
+                    <ul class="list-disc pl-5 space-y-3 mt-4 text-[#333333]">
+                        <li><strong class="text-[#4A90E2]">ARPU (每用户平均收入):</strong> 极高。用户习惯了Netflix等订阅模式，对优质内容单集付费（Pay-per-episode）意愿极强，单剧客单价可达$20-$50。</li>
+                        <li><strong class="text-[#4A90E2]">受众偏好:</strong> 狼人(Werewolf)、吸血鬼(Vampire)、亿万富翁(Billionaire)题材、大女主复仇。偏好欧美本土面孔拍摄的短剧。</li>
+                        <li><strong class="text-[#4A90E2]">商业建议:</strong> 利润最丰厚的阵地，但买量成本极高。建议采用精良制作+重度投流策略。</li>
+                    </ul>
+                `
+            },
+            asia: {
+                title: "🇸🇬 🇲🇾 东南亚及亚洲大国",
+                color: "#27AE60",
+                details: `
+                    <ul class="list-disc pl-5 space-y-3 mt-4 text-[#333333]">
+                        <li><strong class="text-[#4A90E2]">ARPU:</strong> 较低。流量巨大，但用户付费能力有限，主要依赖低价包月（Subscription）或看广告解锁（IAA）。</li>
+                        <li><strong class="text-[#4A90E2]">受众偏好:</strong> 甜宠、霸道总裁、婆媳关系、赘婿战神。文化壁垒极低，国内优质短剧加上当地语言字幕即可直接出海。</li>
+                        <li><strong class="text-[#4A90E2]">商业建议:</strong> 适合作为国内库存剧出海的第一站，主打薄利多销和流量变现。需注意印尼等国的宗教禁忌。</li>
+                    </ul>
+                `
+            },
+            eu: {
+                title: "🇪🇺 🇬🇧 欧洲市场",
+                color: "#8E44AD",
+                details: `
+                    <ul class="list-disc pl-5 space-y-3 mt-4 text-[#333333]">
+                        <li><strong class="text-[#4A90E2]">ARPU:</strong> 中等偏上。处于快速增长的蓝海阶段，用户成熟度高。</li>
+                        <li><strong class="text-[#4A90E2]">受众偏好:</strong> 悬疑、惊悚、剧情逻辑严密的复仇类短剧。对单纯的无脑爽剧不感冒，要求一定的内容深度。</li>
+                        <li><strong class="text-[#4A90E2]">商业建议:</strong> 语言本地化门槛高（法、德、西语等）。目前竞争相对北美较小，抢占小语种高地是极佳策略。</li>
+                    </ul>
+                `
+            }
+        };
+
+        function updateMarket(region) {
+            const container = document.getElementById('market-details');
+            const data = marketData[region];
+            
+            container.classList.remove('fade-in');
+            void container.offsetWidth;
+            
+            container.style.borderLeftColor = data.color;
+            container.innerHTML = `
+                <h3 class="text-2xl font-bold mb-2" style="color: ${data.color}">${data.title}</h3>
+                ${data.details}
+            `;
+            container.classList.add('fade-in');
+        }
+
+        function openTab(evt, tabName) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.add("hide");
+            }
+            const tabBtns = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.remove("hide");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                icon.style.transform = "rotate(0deg)";
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+                icon.style.transform = "rotate(180deg)";
+            }
+        }
+
+        function wrapLabel(label) {
+            if (label.length <= 16) return label;
+            const words = label.split(''); 
+            const lines = [];
+            let currentLine = '';
+            for (let i = 0; i < words.length; i++) {
+                currentLine += words[i];
+                if (currentLine.length >= 16) {
+                    lines.push(currentLine);
+                    currentLine = '';
+                }
+            }
+            if (currentLine.length > 0) {
+                lines.push(currentLine);
+            }
+            return lines;
+        }
+
+        const commonTooltipConfig = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join(''); 
+                    } else {
+                        return label;
+                    }
+                }
+            },
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            titleColor: '#333333',
+            bodyColor: '#666666',
+            borderColor: 'rgba(0,0,0,0.1)',
+            borderWidth: 1,
+            padding: 12,
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        };
+
+        Chart.defaults.color = '#666666';
+        Chart.defaults.font.family = "'Helvetica Neue', Helvetica, Arial, sans-serif";
+
+        const ctxRpm = document.getElementById('rpmChart').getContext('2d');
+        new Chart(ctxRpm, {
+            type: 'bar',
+            data: {
+                labels: [
+                    wrapLabel('YouTube Shorts (广告长尾收益)'),
+                    wrapLabel('Facebook Reels (优质欧美用户)'),
+                    wrapLabel('TikTok (创作者基金打底)'),
+                    wrapLabel('独立APP分销 (CPS高额充值抽成)') 
+                ],
+                datasets: [{
+                    label: '预估平均 RPM (USD)',
+                    data: [0.15, 0.10, 0.03, 15.00], 
+                    backgroundColor: [
+                        'rgba(230, 126, 34, 0.8)', 
+                        'rgba(74, 144, 226, 0.8)',  
+                        'rgba(39, 174, 96, 0.8)',   
+                        'rgba(142, 68, 173, 0.8)'   
+                    ],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        type: 'logarithmic', 
+                        title: { display: true, text: 'USD (对数刻度)', color: '#333333' },
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 11 }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: commonTooltipConfig
+                }
+            }
+        });
+
+        const ctxRadar = document.getElementById('radarChart').getContext('2d');
+        new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: [
+                    wrapLabel('自然流量获取难度 (分低代表易)'),
+                    wrapLabel('欧美用户客单价 / 付费意愿'),
+                    wrapLabel('平台规则严苛度 (版权查重等)'),
+                    wrapLabel('私域引流友好度'),
+                    wrapLabel('商业变现天花板')
+                ],
+                datasets: [{
+                    label: 'TikTok',
+                    data: [2, 5, 8, 9, 7],
+                    backgroundColor: 'rgba(39, 174, 96, 0.2)',
+                    borderColor: '#27AE60',
+                    pointBackgroundColor: '#27AE60',
+                    borderWidth: 2
+                }, {
+                    label: 'YouTube',
+                    data: [5, 8, 10, 6, 8],
+                    backgroundColor: 'rgba(230, 126, 34, 0.2)',
+                    borderColor: '#E67E22',
+                    pointBackgroundColor: '#E67E22',
+                    borderWidth: 2
+                }, {
+                    label: 'FB Reels',
+                    data: [7, 9, 9, 7, 7],
+                    backgroundColor: 'rgba(74, 144, 226, 0.2)',
+                    borderColor: '#4A90E2',
+                    pointBackgroundColor: '#4A90E2',
+                    borderWidth: 2
+                }, {
+                    label: '独立短剧APP',
+                    data: [9, 10, 3, 2, 10], 
+                    backgroundColor: 'rgba(142, 68, 173, 0.2)',
+                    borderColor: '#8E44AD',
+                    pointBackgroundColor: '#8E44AD',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(0, 0, 0, 0.05)' },
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        pointLabels: { color: '#333333', font: { size: 11, weight: '500' } },
+                        ticks: { display: false, min: 0, max: 10 }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#333333', usePointStyle: true, padding: 20 } },
+                    tooltip: commonTooltipConfig
+                }
+            }
+        });
+
+        // ==========================================
+        // Gemini API 智能交互逻辑
+        // ==========================================
+        
+        async function callGemini(promptText) {
+            // 这里替换成你未来部署好的真实后端服务器地址
+            const backendUrl = "/api/gemini";
+
+            let retries = 3;
+            let delay = 1000;
+            for (let i = 0; i < retries; i++) {
+                try {
+                    // 请求你自己的后端服务器，而不是直接请求谷歌
+                    const response = await fetch(backendUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt: promptText }) // 只传 prompt 过去
+                    });
+                    
+                    if (!response.ok) throw new Error(`HTTP 错误! 状态码: ${response.status}`);
+                    const result = await response.json();
+                    
+                    // 假设你的后端返回的数据格式是 { reply: "..." }
+                    return result.reply || "AI未能生成有效内容。";
+                } catch (error) {
+                    if (i === retries - 1) return `请求失败: ${error.message}。请确保后端服务正常运行。`;
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        function showAILoading(type) {
+            const resultDiv = document.getElementById('ai-result-content');
+            document.getElementById('copy-btn').classList.add('hidden');
+            let msg = type === 'hook' ? '✨ Gemini AI 正在为您创作爆款英文文案...' : '🔍 Gemini AI 正在进行深度本地文化排查...';
+            let color = type === 'hook' ? 'text-[#4A90E2]' : 'text-[#8E44AD]';
+            
+            resultDiv.innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center space-y-4">
+                    <div class="w-10 h-10 border-4 border-gray-100 border-t-[#E67E22] rounded-full animate-spin"></div>
+                    <p class="${color} font-bold animate-pulse text-base">${msg}</p>
+                </div>
+            `;
+        }
+
+        function formatGeminiText(text) {
+            return text
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') // 防 XSS
+                .replace(/\n/g, '<br>') // 处理换行
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#333333] text-base">$1</strong>') // 处理粗体
+                .replace(/\*(.*?)\*/g, '<em class="text-[#E67E22] not-italic font-bold">$1</em>'); // 处理斜体为强调色
+        }
+
+        async function generateHook() {
+            const plot = document.getElementById('ai-plot-input').value.trim();
+            const target = document.getElementById('ai-target-market').value;
+            const resultDiv = document.getElementById('ai-result-content');
+
+            if (!plot) {
+                resultDiv.innerHTML = '<div class="h-full flex items-center justify-center"><span class="text-red-500 font-bold bg-red-50 p-4 rounded-lg">⚠️ 请先输入您的核心剧情梗概！</span></div>';
+                return;
+            }
+
+            showAILoading('hook');
+            
+            const prompt = `我有一部中国微短剧准备出海到【${target}】。剧情梗概是："${plot}"。
+            请帮我完成以下两项任务：
+            1. 生成 3 个极具吸引力、符合当地语言习惯的纯正英文剧名（不要生硬的中翻英，要贴合当地爽文命名风格，比如加上 Billionaire, Alpha, Revenge 等词）。
+            2. 为 TikTok 或 YouTube Shorts 生成 3 组用于短视频切片的英文“黄金三秒”引流文案（Hook）。文案需要极具戏剧冲突和悬念，促使用户点击链接去独立APP充值观看。
+            
+            请用中文进行简要的思路解析，但剧名和文案必须是英文。使用 Markdown 格式输出。`;
+            
+            const text = await callGemini(prompt);
+            resultDiv.innerHTML = formatGeminiText(text);
+            document.getElementById('copy-btn').classList.remove('hidden');
+        }
+
+        async function checkCompliance() {
+            const plot = document.getElementById('ai-plot-input').value.trim();
+            const target = document.getElementById('ai-target-market').value;
+            const resultDiv = document.getElementById('ai-result-content');
+
+            if (!plot) {
+                resultDiv.innerHTML = '<div class="h-full flex items-center justify-center"><span class="text-red-500 font-bold bg-red-50 p-4 rounded-lg">⚠️ 请先输入您的核心剧情梗概！</span></div>';
+                return;
+            }
+
+            showAILoading('compliance');
+            
+            const prompt = `我有一部中国微短剧准备出海到【${target}】。剧情梗概是："${plot}"。
+            请你作为当地的文化审查专家，对我提供的内容进行深度本地化排查：
+            1. 评估在【${target}】是否存在宗教、种族、伦理、政治等敏感风险。
+            2. 指出剧情中不符合当地人生活逻辑或价值观的地方（例如：赘婿文化在某些国家不成立）。
+            3. 提供具体的剧情本地化改编建议（如何在保留爽感的同时安全落地）。
+            
+            请结构清晰地用中文作答，直接指出痛点。使用 Markdown 格式输出。`;
+            
+            const text = await callGemini(prompt);
+            resultDiv.innerHTML = formatGeminiText(text);
+            document.getElementById('copy-btn').classList.remove('hidden');
+        }
+
+        function copyResult() {
+            const resultText = document.getElementById('ai-result-content').innerText;
+            if (!resultText) return;
+            
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = resultText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            
+            try {
+                document.execCommand('copy');
+                const btn = document.getElementById('copy-btn');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '✅ 已成功复制！';
+                btn.classList.add('text-green-500');
+                setTimeout(() => { 
+                    btn.innerHTML = originalHTML; 
+                    btn.classList.remove('text-green-500');
+                }, 2000);
+            } catch (err) {
+                console.error('复制失败', err);
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+    </script>
+</body>
+</html>
